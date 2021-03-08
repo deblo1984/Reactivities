@@ -10,19 +10,33 @@ interface Props {
     selectedActivity: Activity | undefined;
     selectActivity: (id: string) => void;
     cancelSelectActivity: () => void;
+    editMode: boolean;
+    openForm: (id: string) => void;
+    closeForm: () => void;
+    createOrEdit: (activity: Activity) => void;
+    deleteActivity: (id: string) => void;
 }
 
-export default function ActivityDashoard({ activities, selectedActivity, selectActivity, cancelSelectActivity }: Props) {
+export default function ActivityDashoard({ activities, selectedActivity, deleteActivity,
+    selectActivity, cancelSelectActivity, editMode, openForm, closeForm, createOrEdit }: Props) {
     return (
         <Grid>
             <Grid.Column width='10'>
-                <ActivityList activities={activities} selectActivity={selectActivity} />
+                <ActivityList activities={activities}
+                    selectActivity={selectActivity}
+                    deleteActivity={deleteActivity}
+                />
             </Grid.Column>
             <Grid.Column width='6'>
-                {selectedActivity &&
-                    <ActivityDetails activity={selectedActivity} cancelSelectActivity={cancelSelectActivity} />
+                {selectedActivity && !editMode &&
+                    <ActivityDetails activity={selectedActivity}
+                        cancelSelectActivity={cancelSelectActivity}
+                        openForm={openForm}
+                    />
                 }
-                <ActivityForm />
+                {editMode &&
+                    <ActivityForm closeForm={closeForm} activity={selectedActivity} createOrEdit={createOrEdit} />
+                }
             </Grid.Column>
         </Grid>
     )
