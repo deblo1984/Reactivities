@@ -17,6 +17,7 @@ function App() {
         path={'/(.+)'}
         render={() => (
           <>
+            <NavBar />
             <Container style={{ marginTop: '7em ' }}>
               <Route exact path='/activities' component={ActivityDashoard} />
               <Route path='/activities/:id' component={ActivityDetails} />
@@ -25,8 +26,6 @@ function App() {
           </>
         )}
       />
-      <NavBar />
-
     </>
   );
 }
