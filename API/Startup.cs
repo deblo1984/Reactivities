@@ -7,8 +7,6 @@ using Application.Core;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +16,9 @@ using Microsoft.OpenApi.Models;
 using Persistence;
 using FluentValidation.AspNetCore;
 using API.Middleware;
+using API.Extensions;
+using Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace API
 {
@@ -48,6 +49,15 @@ namespace API
             {
                 options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
             });
+
+            services.AddIdentityCore<AppUser>(opt =>
+            {
+                opt.Password.RequireNonAlphanumeric = false;
+            })
+            .AddEntityFrameworkStores<DataContext>()
+            .AddSignInManager<SignInManager<AppUser>>();
+
+
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", policy =>
@@ -58,6 +68,8 @@ namespace API
 
             services.AddMediatR(typeof(List.Handler).Assembly);
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
+            services.AddIdentityServices(_config);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,6 +87,8 @@ namespace API
             app.UseRouting();
 
             app.UseCors("CorsPolicy");
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
