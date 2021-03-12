@@ -9,6 +9,7 @@ namespace API.Controllers
 {
     public class ActivitiesController : BaseApiController
     {
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetActivities()
         {
@@ -22,12 +23,14 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new Details.Query { Id = id }));
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateActivity([FromBody] Activity activity)
         {
             return HandleResult(await Mediator.Send(new Create.Command { Activity = activity }));
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> EditActivity(Guid id, Activity activity)
         {
@@ -35,6 +38,7 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new Edit.Command { Activity = activity }));
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id)
         {
