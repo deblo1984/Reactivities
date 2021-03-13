@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Application.Actvities;
 using Application.Core;
 using MediatR;
@@ -11,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Persistence;
 using FluentValidation.AspNetCore;
@@ -21,6 +16,7 @@ using Domain;
 using Microsoft.AspNetCore.Identity;
 using Application.Interface;
 using Infrastructure.Security;
+using Infrastructure.Photos;
 
 namespace API
 {
@@ -71,6 +67,8 @@ namespace API
             services.AddMediatR(typeof(List.Handler).Assembly);
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddScoped<IUserAccessor, UserAccessor>();
+            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            services.Configure<CloudinarySettings>(_config.GetSection("Cloudinary"));
 
             services.AddIdentityServices(_config);
         }
