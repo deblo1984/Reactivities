@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Application.Interface;
 using Infrastructure.Security;
 using Infrastructure.Photos;
+using API.SignalR;
 
 namespace API
 {
@@ -60,7 +61,10 @@ namespace API
             {
                 options.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+                    policy.AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .WithOrigins("http://localhost:3000");
                 });
             });
 
@@ -69,6 +73,7 @@ namespace API
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
             services.Configure<CloudinarySettings>(_config.GetSection("Cloudinary"));
+            services.AddSignalR();
 
             services.AddIdentityServices(_config);
         }
@@ -96,6 +101,7 @@ namespace API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat");
             });
         }
     }
