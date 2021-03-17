@@ -6,6 +6,8 @@ import { store } from "./store";
 
 export default class UserStore {
     user: User | null = null;
+    fbAccessToken: string | null = null;
+    fbLoading = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -62,5 +64,49 @@ export default class UserStore {
 
     setDisplayName = (name: string) => {
         if (this.user) this.user.displayName = name;
+    }
+
+    facebookLogin = () => {
+        this.fbLoading = true;
+        const apiLogin = (accessToken: string) => {
+            agent.Account.fbLogin(accessToken).then(user => {
+                store.commonStore.setToken(user.token);
+                runInAction(() => {
+                    this.user = user;
+                    this.fbLoading = false;
+                })
+                history.push('/activities');
+            }).catch(error => {
+                console.log(error);
+                runInAction(() => this.fbLoading = false)
+
+            })
+        }
+        if (this.fbAccessToken) {
+            apiLogin(this.fbAccessToken);
+        } else {
+            window.FB.login(response => {
+                var login = response.authResponse ? response.authResponse.accessToken : null;
+                apiLogin(login!)
+            }, { scope: 'public_profile,email' })
+        }
+    }
+
+    getFacebookLoginStatus = async () => {
+        window.FB.getLoginStatus(response => {
+            if (response.status === 'connected') {
+                this.fbAccessToken = response.authResponse.accessToken;
+            }
+        })
+    }
+
+    googleResponse = (response: any) => {
+        const tokenBlob = new Blob([JSON.stringify({ tokenId: response.tokenId }, null, 2)], { type: 'application/json' });
+        const options = {
+            method: 'POST',
+            body: tokenBlob,
+            mode: 'cors',
+            cache: 'default'
+        };
     }
 }

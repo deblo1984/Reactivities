@@ -82,16 +82,31 @@ namespace API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseXContentTypeOptions();
+            app.UseReferrerPolicy(options => options.NoReferrer());
+            app.UseXXssProtection(options => options.EnabledWithBlockMode());
+            app.UseXfo(options => options.Deny());
+            app.UseCsp(options => options
+                .BlockAllMixedContent()
+                .FormActions(s => s.Self())
+                .FrameAncestors(s => s.Self())
+            );
+
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
 
+            app.UseHsts();
+
             //app.UseHttpsRedirection();
 
             app.UseRouting();
+
             app.UseDefaultFiles();
+
             app.UseStaticFiles();
 
             app.UseCors("CorsPolicy");
